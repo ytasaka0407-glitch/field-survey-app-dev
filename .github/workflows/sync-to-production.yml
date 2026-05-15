@@ -1,0 +1,24 @@
+name: Sync to Production
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout dev repository
+        uses: actions/checkout@v4
+
+      - name: Push files to production repository
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.PROD_REPO_TOKEN }}
+        with:
+          source-directory: "."
+          destination-github-username: "ytasaka0407-glitch"
+          destination-repository-name: "field-survey-app"
+          user-email: "github-actions[bot]@users.noreply.github.com"
+          user-name: "github-actions[bot]"
+          target-branch: "main"
