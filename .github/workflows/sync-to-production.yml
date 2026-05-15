@@ -11,17 +11,37 @@ jobs:
       - name: Checkout dev repository
         uses: actions/checkout@v4
 
+      - name: Show repository files
+        run: |
+          echo "Repository root files:"
+          pwd
+          ls -la
+          echo "Recursive file list:"
+          find . -maxdepth 5 -type f | sort
+
       - name: Prepare release files
         run: |
           mkdir -p release
+          mkdir -p release/FieldSurveyApp
 
           cp index.html release/
           cp service-worker.js release/
-          cp manifest.webmanifest release/
 
-          if [ -d assets ]; then cp -r assets release/; fi
-          if [ -d icons ]; then cp -r icons release/; fi
-          if [ -d lib ]; then cp -r lib release/; fi
+          if [ -f FieldSurveyApp/manifest.webmanifest ]; then
+            cp FieldSurveyApp/manifest.webmanifest release/FieldSurveyApp/
+          fi
+
+          if [ -d FieldSurveyApp/assets ]; then
+            cp -r FieldSurveyApp/assets release/FieldSurveyApp/
+          fi
+
+          if [ -d FieldSurveyApp/icons ]; then
+            cp -r FieldSurveyApp/icons release/FieldSurveyApp/
+          fi
+
+          if [ -d lib ]; then
+            cp -r lib release/
+          fi
 
       - name: Show release files
         run: |
