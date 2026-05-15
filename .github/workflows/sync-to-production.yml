@@ -1,4 +1,4 @@
-name: Sync to Production
+name: Sync Public Files to Production
 
 on:
   workflow_dispatch:
@@ -11,12 +11,29 @@ jobs:
       - name: Checkout dev repository
         uses: actions/checkout@v4
 
-      - name: Push files to production repository
+      - name: Prepare release files
+        run: |
+          mkdir -p release
+
+          cp index.html release/
+          cp service-worker.js release/
+          cp manifest.webmanifest release/
+
+          if [ -d assets ]; then cp -r assets release/; fi
+          if [ -d icons ]; then cp -r icons release/; fi
+          if [ -d lib ]; then cp -r lib release/; fi
+
+      - name: Show release files
+        run: |
+          echo "Release files:"
+          find release -type f | sort
+
+      - name: Push release files to production repository
         uses: cpina/github-action-push-to-another-repository@main
         env:
           API_TOKEN_GITHUB: ${{ secrets.PROD_REPO_TOKEN }}
         with:
-          source-directory: "."
+          source-directory: "release"
           destination-github-username: "ytasaka0407-glitch"
           destination-repository-name: "field-survey-app"
           user-email: "github-actions[bot]@users.noreply.github.com"
