@@ -23,7 +23,6 @@ export async function exportToExcel(projectTitle, projectDate, sharedStations) {
   };
 
   const projectDateStr = projectDate || '';
-  const exportDate     = new Date();
   const coverDateText = projectDateStr ? projectDateStr.replace(/-/g, '/') : '';
 
   // 表紙
