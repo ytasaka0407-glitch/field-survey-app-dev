@@ -1,6 +1,6 @@
 // FieldSurveyApp/assets/js/modules/excel/export.js
 import { dataMap, selectedCategories, ensureSingle, ensureMulti, getOrInitStationData } from '../state.js';
-import { sanitizeSheetName, makeUniqueSheetName, fromInputDate, getImageDim } from '../utils.js';
+import { sanitizeSheetName, makeUniqueSheetName, getImageDim } from '../utils.js';
 import { getSchemaFor } from '../ui/schemas.js';
 
 export async function exportToExcel(projectTitle, projectDate, sharedStations) {
@@ -24,7 +24,7 @@ export async function exportToExcel(projectTitle, projectDate, sharedStations) {
 
   const projectDateStr = projectDate || '';
   const exportDate     = new Date();
-  const coverDate      = fromInputDate(projectDateStr) || exportDate;
+  const coverDateText = projectDateStr ? projectDateStr.replace(/-/g, '/') : '';
 
   // 表紙
   const wsCover = wb.addWorksheet('表紙', {
@@ -48,7 +48,7 @@ export async function exportToExcel(projectTitle, projectDate, sharedStations) {
   wsCover.getCell('H8').value = safeStr(projectTitle || '-');
   wsCover.getCell('H8').font  = { name: 'Meiryo UI' };
   wsCover.getCell('G10').value = '日付'; wsCover.getCell('G10').style = labelStyle;
-  wsCover.getCell('H10').value = coverDate; wsCover.getCell('H10').numFmt = 'yyyy/mm/dd';
+  wsCover.getCell('H10').value = coverDateText || '-';
   wsCover.getCell('H10').font = { name: 'Meiryo UI' };
   wsCover.getCell('H10').alignment = { horizontal: 'left' };
 
@@ -168,9 +168,12 @@ export async function exportToExcel(projectTitle, projectDate, sharedStations) {
     // 基本項目（並び: 調査日, 設置場所, 新設/既設, 設置方法(新設時), OK/NG, NG理由(NG時), その他調査内容）
     // 調査日
     ws.getCell('A3').value = '調査日'; ws.getCell('A3').style = labelStyle;
-    const d = fromInputDate(entry.model.date || projectDateStr);
-    if (d) { ws.getCell('B3').value = d; ws.getCell('B3').numFmt = 'yyyy/mm/dd'; }
-    else { ws.getCell('B3').value = '-'; }
+    const dText = (entry.model.date || projectDateStr || '').trim();
+    if (dText) {
+      ws.getCell('B3').value = dText.replace(/-/g, '/');
+    } else {
+      ws.getCell('B3').value = '-';
+    }
     ws.getCell('B3').font = { name: 'Meiryo UI' };
     ws.getCell('B3').alignment = { horizontal: 'left' };
 
